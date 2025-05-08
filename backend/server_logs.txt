@@ -1,0 +1,32 @@
+/Users/nitinsareen/miniconda3/lib/python3.12/site-packages/pydantic/_internal/_config.py:345: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Will watch for changes in these directories: ['/Users/nitinsareen/Documents/GitHub/nitin-sareen/ContentPlatform/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [71013] using StatReload
+Loaded environment variables from /Users/nitinsareen/Documents/GitHub/nitin-sareen/ContentPlatform/backend/.env
+Loaded API key directly from .env file: sk-pr...
+Brand voice agent initialized successfully
+Rich content agent initialized successfully
+/Users/nitinsareen/miniconda3/lib/python3.12/site-packages/pydantic/_internal/_config.py:345: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [71023]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/agents/rich_content_agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71023]
+/Users/nitinsareen/miniconda3/lib/python3.12/site-packages/pydantic/_internal/_config.py:345: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [71172]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71172]
+INFO:     Stopping reloader process [71013]

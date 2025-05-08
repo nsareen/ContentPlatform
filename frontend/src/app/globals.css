@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Design system colors */
+  --primary: #6D3BEB;
+  --primary-light: #8B63F9;
+  --primary-dark: #5A26B8;
+  --secondary: #007AFF;
+  --secondary-light: #3EAFFF;
+  --text-primary: #1E2334;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --background-default: #FFFFFF;
+  --background-surface: #F8FAFC;
+  --background-light: #FFFFFF;
+  --border-default: #E2E8F0;
+  --border-light: #F1F5F9;
+  --feedback-success: #10B981;
+  --feedback-warning: #F59E0B;
+  --feedback-error: #EF4444;
+  
+  /* Border radius */
+  --radius: 0.625rem;
+}
+
+/* Base styles */
+body {
+  background-color: var(--background-surface);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Component styles */
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: var(--background-surface);
+}
+
+.card {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-default);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* Layout styles */
+.container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Status badges */
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-draft {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.badge-published {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.badge-review {
+  background-color: #DBEAFE;
+  color: #1E40AF;
+}
+
+.badge-inactive {
+  background-color: #F3F4F6;
+  color: #4B5563;
+}
+
+/* Additional utility classes */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Form elements */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.form-error {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--feedback-error);
+}

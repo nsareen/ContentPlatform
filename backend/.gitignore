@@ -1,0 +1,23 @@
+# Python virtual environment
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+*.db
+
+# Environment variables
+# .env  # Uncomment this if you don't want to commit your .env file
+
+# Alembic migration files
+alembic/versions/__pycache__/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
