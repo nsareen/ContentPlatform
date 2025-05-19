@@ -130,7 +130,26 @@ class GenerateImageTool(BaseTool):
                     params["background"] = "transparent"
             
             # Generate image
-            print(f"Calling OpenAI with params: {params}")
+            print("\n" + "=" * 80)
+            print("IMAGE GENERATION - FULL PARAMETERS:")
+            print("=" * 80)
+            print(f"Model: {model}")
+            print(f"Size: {size}")
+            print(f"Quality: {quality if 'quality' in params else 'N/A'}")
+            print(f"Style: {style if 'style' in params else 'N/A'}")
+            print(f"Format: {format if 'response_format' in params else 'N/A'}")
+            print("\nFULL PROMPT:")
+            print("-" * 80)
+            print(description)
+            print("-" * 80)
+            print("\nAPI CALL PARAMETERS:")
+            for key, value in params.items():
+                if key != 'prompt':  # Skip printing the prompt again
+                    print(f"{key}: {value}")
+            print("=" * 80 + "\n")
+            
+            # Make the API call
+            print(f"Calling OpenAI images.generate API...")
             response = client.images.generate(**params)
             
             # Process response based on format
@@ -225,6 +244,26 @@ class GenerateRichContentTool(BaseTool):
                 prompt=prompt
             )
             
+            # Log the full system prompt and user message
+            print("\n" + "=" * 80)
+            print("RICH CONTENT GENERATION - SYSTEM PROMPT:")
+            print("=" * 80)
+            print(formatted_prompt)
+            print("=" * 80)
+            
+            print("\n" + "=" * 80)
+            print("RICH CONTENT GENERATION - USER MESSAGE:")
+            print("=" * 80)
+            print(prompt)
+            print("=" * 80 + "\n")
+            
+            # Log the user prompt
+            print("\n" + "=" * 80)
+            print("RICH CONTENT GENERATION - USER PROMPT:")
+            print("=" * 80)
+            print(prompt)
+            print("=" * 80 + "\n")
+            
             # Get the LLM
             llm = get_llm()
             
@@ -246,10 +285,24 @@ class GenerateRichContentTool(BaseTool):
                     if hasattr(response, 'content'):
                         content = response.content
                         print(f"Successfully extracted content from response: {content[:50]}...")
+                        
+                        # Log the full LLM response
+                        print("\n" + "=" * 80)
+                        print("RICH CONTENT GENERATION - LLM RESPONSE:")
+                        print("=" * 80)
+                        print(content)
+                        print("=" * 80 + "\n")
                     else:
                         # If response doesn't have content attribute, convert to string
                         content = str(response)
                         print(f"Converted response to string: {content[:50]}...")
+                        
+                        # Log the full LLM response
+                        print("\n" + "=" * 80)
+                        print("RICH CONTENT GENERATION - LLM RESPONSE (CONVERTED):")
+                        print("=" * 80)
+                        print(content)
+                        print("=" * 80 + "\n")
             except Exception as e:
                 print(f"Exception during LLM invocation: {str(e)}")
                 raise e
@@ -257,6 +310,18 @@ class GenerateRichContentTool(BaseTool):
             # More robust parsing logic to extract image descriptions
             text_content = content
             image_descriptions = self._extract_image_descriptions(content)
+            
+            # Log the extracted image descriptions
+            print("\n" + "=" * 80)
+            print("EXTRACTED IMAGE DESCRIPTIONS:")
+            print("=" * 80)
+            print(f"Total extracted: {len(image_descriptions)}")
+            for i, desc in enumerate(image_descriptions):
+                print(f"\nIMAGE DESCRIPTION #{i+1}:")
+                print("-" * 60)
+                print(desc)
+                print("-" * 60)
+            print("=" * 80 + "\n")
             
             print(f"Extracted {len(image_descriptions)} image descriptions")
             for i, desc in enumerate(image_descriptions):
@@ -649,7 +714,21 @@ def invoke_rich_content_agent(
     content_type: str = "flyer",
     context: Dict[str, Any] = None
 ) -> Dict[str, Any]:
-    """Invoke the rich content agent with a user message."""
+    """
+    Invoke the rich content agent with a user message.
+    
+    This function logs the entire workflow from initial request to final response,
+    making it easy to debug and understand the rich content generation process.
+    """
+    # Log the invocation details
+    print("\n" + "*" * 100)
+    print("INVOKING RICH CONTENT AGENT")
+    print("*" * 100)
+    print(f"Invoking rich content agent with message: {message[:50]}...")
+    print(f"Brand voice ID: {brand_voice_id}")
+    print(f"Content type: {content_type}")
+    print(f"Context: {context}")
+    print("*" * 100 + "\n")
     global rich_content_agent
     
     print(f"Invoking rich content agent with message: {message[:50]}...")
@@ -855,9 +934,14 @@ def invoke_rich_content_agent(
                             
                 # If no images were generated, add a detailed error message
                 if not generated_images:
-                    print("WARNING: No images were generated. This might be due to API key limitations.")
+                    print("\n" + "!" * 80)
+                    print("WARNING: IMAGE GENERATION FAILED")
+                    print("!" * 80)
+                    print("No images were generated. This might be due to API key limitations.")
                     print("Project-based API keys (sk-proj-...) may not have access to image generation APIs.")
                     print("Consider using a standard API key (sk-...) for image generation.")
+                    print("!" * 80 + "\n")
+                    
                     # Add a detailed error message to the result
                     state["image_generation_error"] = "Failed to generate images. Your API key may not have access to image generation APIs. Project-based API keys (sk-proj-...) typically don't work with DALL-E or GPT Image generation."
             
@@ -878,6 +962,19 @@ def invoke_rich_content_agent(
             # Add image generation error if present
             if "image_generation_error" in final_state:
                 result_dict["result"]["image_generation_error"] = final_state["image_generation_error"]
+            
+            # Log the final result
+            print("\n" + "*" * 100)
+            print("RICH CONTENT AGENT - FINAL RESULT")
+            print("*" * 100)
+            print(f"Status: {result_dict['status']}")
+            print(f"Action: {result_dict['action']}")
+            print(f"Text content length: {len(result_dict['result']['text_content'])} characters")
+            print(f"Number of images: {len(result_dict['result']['images'])}")
+            print(f"Number of image descriptions: {len(result_dict['result']['image_descriptions'])}")
+            if 'image_generation_error' in result_dict['result']:
+                print(f"Image generation error: {result_dict['result']['image_generation_error']}")
+            print("*" * 100 + "\n")
             
             return result_dict
         elif "error" in final_state:
