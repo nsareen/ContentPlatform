@@ -8,8 +8,8 @@ from typing import Dict, Any, Optional
 
 from app.core.auth import get_current_active_user
 from app.db.database import get_db
-from app.models.models import User, BrandVoice
-from app.agents.brand_voice_agent import invoke_brand_voice_agent
+from app.models.models import User, BrandVoice, UserRole
+from app.agents.brand_voice_agent_v1 import invoke_brand_voice_agent
 
 router = APIRouter(
     prefix="/agent",
@@ -108,8 +108,8 @@ async def generate_content(
             detail="Brand voice not found"
         )
     
-    # Check if user belongs to the tenant
-    if current_user.tenant_id != db_voice.tenant_id:
+    # Check if user belongs to the tenant or is an admin
+    if current_user.tenant_id != db_voice.tenant_id and current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this brand voice"

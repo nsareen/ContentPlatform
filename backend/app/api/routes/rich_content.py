@@ -8,8 +8,8 @@ from typing import Dict, Any, Optional, List
 
 from app.core.auth import get_current_active_user
 from app.db.database import get_db
-from app.models.models import User, BrandVoice
-from app.agents.rich_content_agent import invoke_rich_content_agent
+from app.models.models import User, BrandVoice, UserRole
+from app.agents.rich_content_agent_v1 import invoke_rich_content_agent
 
 router = APIRouter(
     prefix="/rich-content",
@@ -53,7 +53,8 @@ async def generate_rich_content(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Brand voice not found"
             )
-        if brand_voice.tenant_id != current_user.tenant_id:
+        # Check if user belongs to the tenant or is an admin
+        if brand_voice.tenant_id != current_user.tenant_id and current_user.role != UserRole.ADMIN:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not authorized to access this brand voice"
