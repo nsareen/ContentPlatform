@@ -80,7 +80,7 @@ async function getAuthToken(): Promise<string | null> {
   // Try to get a dev token
   try {
     console.log('No auth token found, attempting to get dev token');
-    const tokenResponse = await fetch('http://localhost:8001/api/dev-token', {
+    const tokenResponse = await fetch('http://localhost:8000/api/dev-token', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ async function getAuthToken(): Promise<string | null> {
 async function checkBackendAvailability(): Promise<boolean> {
   try {
     // Try to access the root endpoint which doesn't require auth
-    const response = await fetch('http://localhost:8001/', {
+    const response = await fetch('http://localhost:8000/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -197,7 +197,7 @@ export function RichPlaygroundPanel({
       }
 
       // Make API request to generate content
-      const response = await fetch('http://localhost:8001/api/rich-content/generate', {
+      const response = await fetch('http://localhost:8000/api/rich-content/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,0 +1,22 @@
+# Core dependencies
+fastapi==0.95.1
+uvicorn==0.22.0
+sqlalchemy==2.0.12
+pydantic==1.10.7  # Specific version for LangChain compatibility
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+alembic==1.10.4
+email-validator==2.0.0
+
+# LangChain and related dependencies - versions known to work together
+langchain==0.0.267
+langchain-core==0.0.9  # Downgraded to avoid langsmith conflict
+langsmith==0.0.21
+openapi-schema-pydantic==1.2.4
+langgraph==0.0.15
+
+# Other dependencies
+python-dotenv==1.0.0
+openai==0.28.1
+anthropic==0.5.0

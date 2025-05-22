@@ -20,10 +20,11 @@ try:
 except ImportError:
     print("python-dotenv not installed, skipping .env loading")
 
-from langchain_openai import ChatOpenAI
-from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import BaseMessage, AIMessage
-from langchain_core.outputs import ChatGeneration, ChatResult
+from langchain.chat_models import ChatOpenAI
+from langchain.chat_models.base import BaseChatModel
+from langchain.schema import BaseMessage, AIMessage
+from langchain.schema import LLMResult as ChatResult
+from langchain.schema import Generation as ChatGeneration
 
 # Default model configuration
 DEFAULT_MODEL = "gpt-4o"

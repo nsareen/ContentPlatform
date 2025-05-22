@@ -56,19 +56,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     # Check for development environment
     is_dev = os.environ.get("ENV", "development") == "development"  # Default to development mode
     print(f"Current environment: {'development' if is_dev else 'production'}")
+    print(f"Token received: {token[:10]}...")
     
-    # In development mode, always return a mock user for any token
-    # This is ONLY for development and would be a security risk in production
-    if is_dev:
+    # Special handling for development mode tokens
+    if is_dev and token and ("mock-signature" in token or token.startswith("dev-")):
+        print("Development mode: Detected development token")
         try:
             # Try to decode the token to get user info if available
             try:
-                # First try to decode without verification
+                # First try to decode without verification for development tokens
                 unverified_payload = jwt.decode(token, options={"verify_signature": False})
                 user_id = unverified_payload.get("sub", "user-123")
                 tenant_id = unverified_payload.get("tenant_id", "tenant-123")
                 role = unverified_payload.get("role", "admin")
-                print(f"Development mode: Using token payload with user_id={user_id}")
+                print(f"Development mode: Using token payload with user_id={user_id}, tenant_id={tenant_id}, role={role}")
             except Exception as e:
                 # If token can't be decoded, use default values
                 print(f"Development mode: Could not decode token, using default values. Error: {e}")
@@ -84,7 +85,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
             
             # If test user doesn't exist in DB, create a mock user object
             print("Development mode: Creating mock user")
-            return User(
+            mock_user = User(
                 id=user_id,
                 email="admin@example.com",
                 full_name="Test User",
@@ -92,10 +93,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
                 tenant_id=tenant_id,
                 is_active=True
             )
+            
+            # Add some debugging attributes to help identify this as a mock user
+            setattr(mock_user, "is_mock_user", True)
+            setattr(mock_user, "created_at", datetime.utcnow())
+            
+            return mock_user
         except Exception as e:
             print(f"Development mode error: {e}")
             # Even if something goes wrong, still return a mock user in development
-            return User(
+            mock_user = User(
                 id="user-123",
                 email="admin@example.com",
                 full_name="Test User",
@@ -103,24 +110,77 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
                 tenant_id="tenant-123",
                 is_active=True
             )
+            setattr(mock_user, "is_mock_user", True)
+            return mock_user
     
-    # For production, perform proper token validation
+    # Try standard token validation first
     try:
         # Decode and verify the token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
         if not user_id:
-            raise credentials_exception
+            raise JWTError("Missing subject claim")
         
         # Look up the user in the database
         user = db.query(User).filter(User.id == user_id).first()
-        if not user:
+        if user:
+            print(f"Found user with ID {user_id} in database")
+            return user
+        else:
+            print(f"User with ID {user_id} not found in database")
+            
+            # In development mode, create a mock user if database lookup fails
+            if is_dev:
+                print("Development mode: Creating mock user since database lookup failed")
+                tenant_id = payload.get("tenant_id", "tenant-123")
+                role = payload.get("role", "admin")
+                
+                mock_user = User(
+                    id=user_id,
+                    email="admin@example.com",
+                    full_name="Test User",
+                    role=role,
+                    tenant_id=tenant_id,
+                    is_active=True
+                )
+                setattr(mock_user, "is_mock_user", True)
+                return mock_user
+            else:
+                raise credentials_exception
+    except JWTError as e:
+        print(f"JWT Error: {str(e)}")
+        # In development mode, try to provide a mock user even if token validation fails
+        if is_dev:
+            print("Development mode: Providing mock user despite JWT error")
+            mock_user = User(
+                id="user-123",
+                email="admin@example.com",
+                full_name="Test User",
+                role="admin",
+                tenant_id="tenant-123",
+                is_active=True
+            )
+            setattr(mock_user, "is_mock_user", True)
+            return mock_user
+        else:
             raise credentials_exception
-        
-        return user
-    except Exception:
-        # In production, any error means invalid credentials
-        raise credentials_exception
+    except Exception as e:
+        print(f"Unexpected error in authentication: {str(e)}")
+        # In development mode, provide a mock user as a last resort
+        if is_dev:
+            print("Development mode: Providing mock user as last resort")
+            mock_user = User(
+                id="user-123",
+                email="admin@example.com",
+                full_name="Test User",
+                role="admin",
+                tenant_id="tenant-123",
+                is_active=True
+            )
+            setattr(mock_user, "is_mock_user", True)
+            return mock_user
+        else:
+            raise credentials_exception
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
     if not current_user.is_active:

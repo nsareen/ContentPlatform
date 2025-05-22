@@ -7,6 +7,7 @@ import { BrandVoiceForm } from '@/components/brand-voice/brand-voice-form';
 import { brandVoiceService } from '@/lib/api/brand-voice-service';
 import { BrandVoice } from '@/components/brand-voice/brand-voice-card';
 import { FloatingActions } from '@/components/brand-voice/floating-actions';
+import { isDevelopment } from '@/config/api-config';
 
 // Define the form data type to match our form
 type BrandVoiceFormData = {
@@ -23,7 +24,11 @@ type BrandVoiceFormData = {
 export default function EditBrandVoicePage() {
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string;
+  
+  if (!id) {
+    console.error('[EditBrandVoicePage] No ID found in route parameters');
+  }
   
   const [brandVoice, setBrandVoice] = useState<BrandVoice | null>(null);
   const [isLoading, setIsLoading] = useState(true);

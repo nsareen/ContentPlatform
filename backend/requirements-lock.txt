@@ -1,0 +1,32 @@
+# First uninstall conflicting packages
+# langchain-anthropic
+# langchain-community
+# langchain-mcp-adapters
+# langchain-openai
+# langchain-text-splitters
+# pydantic-settings
+# pydantic_core
+# mcp
+
+# Core dependencies from requirements.txt
+fastapi==0.95.1
+uvicorn==0.22.0
+sqlalchemy==2.0.12
+pydantic==1.10.7
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+alembic==1.10.4
+email-validator==2.0.0
+
+# LangChain dependencies compatible with Pydantic v1.10.7
+# These versions are known to work with Pydantic v1.10.7
+langchain==0.0.267
+langchain-core==0.0.10
+langsmith==0.0.27
+openapi-schema-pydantic==1.2.4
+
+# Other dependencies
+python-dotenv==1.0.0
+openai==0.28.1
+anthropic==0.5.0

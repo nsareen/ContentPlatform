@@ -1,0 +1,23 @@
+# Core dependencies
+fastapi==0.95.1
+uvicorn==0.22.0
+sqlalchemy==2.0.12
+pydantic==1.10.7
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+alembic==1.10.4
+email-validator==2.0.0
+
+# LangChain and related dependencies
+langchain==0.0.267
+langchain-core==0.0.10
+langsmith==0.0.63
+openapi-schema-pydantic==1.2.4
+langgraph==0.0.27
+langchain-community==0.0.10
+
+# Other dependencies
+python-dotenv==1.0.0
+openai==0.28.1
+anthropic==0.5.0

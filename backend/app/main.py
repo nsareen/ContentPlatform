@@ -1,3 +1,8 @@
+# Import compatibility layers first to ensure they're applied before any other imports
+from app.utils.pydantic_compat import *
+from app.utils.langchain_patch import *
+from app.utils.example_selector_patch import *  # Targeted patch for LengthBasedExampleSelector
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,11 +12,32 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Configure CORS - allow all origins in development mode
+# Import environment variables
+import os
+
+# Determine if we're in development mode
+IS_DEV = os.environ.get('ENV', 'development') == 'development'
+
+# Configure CORS - allow specific origins with credentials
 app.add_middleware(
     CORSMiddleware,
-    # Use a wildcard to allow all origins in development mode
-    allow_origins=["*"],  # This is safe for development but should be restricted in production
+    # In development, allow all localhost origins for easier testing
+    # In production, explicitly list allowed origins for security
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://localhost:3003",
+        "http://localhost:3004",
+        "http://localhost:3005",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
+        "http://127.0.0.1:3003",
+        "http://127.0.0.1:3004",
+        "http://127.0.0.1:3005",
+        # Add any other frontend origins as needed
+    ] if not IS_DEV else ["*"],  # Allow all origins in development mode for easier testing,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     # Explicitly list all headers that might be used

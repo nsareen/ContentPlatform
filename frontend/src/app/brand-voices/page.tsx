@@ -22,7 +22,7 @@ export default function BrandVoicesPage() {
     console.log('[BrandVoicesPage] Starting to fetch brand voices');
     
     try {
-      // Make the API call through the service
+      // Make the API call through the service - now using the /api/voices/all/ endpoint directly
       console.log('[BrandVoicesPage] Calling brandVoiceService.getAllBrandVoices()');
       const voices = await brandVoiceService.getAllBrandVoices();
       
@@ -40,47 +40,6 @@ export default function BrandVoicesPage() {
       } else {
         console.error('[BrandVoicesPage] Unknown error type:', typeof error);
         setErrorMessage('Failed to load brand voices: Unknown error');
-      }
-      
-      // Try a direct fetch as a fallback
-      console.log('[BrandVoicesPage] Attempting direct fetch as fallback');
-      try {
-        const directResponse = await fetch('http://localhost:8000/api/voices/', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMyIsInRlbmFudF9pZCI6InRlbmFudC0xMjMiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3NDY2MTA2NjZ9.056qf8G2X03J4obGB4fkB1YW6AtTdn1nU2A8G7a2uzI'
-          },
-          mode: 'cors'
-        });
-        
-        console.log(`[BrandVoicesPage] Direct fetch response: ${directResponse.status} ${directResponse.statusText}`);
-        
-        if (directResponse.ok) {
-          const directResponseText = await directResponse.text();
-          console.log(`[BrandVoicesPage] Direct fetch response text (first 100 chars): ${directResponseText.substring(0, 100)}...`);
-          
-          try {
-            const directVoices = JSON.parse(directResponseText);
-            console.log(`[BrandVoicesPage] Direct fetch successful, got ${directVoices.length} voices`);
-            setBrandVoices(directVoices);
-            setErrorMessage('Loaded using fallback method. Original error: ' + (error instanceof Error ? error.message : 'Unknown error'));
-          } catch (parseError) {
-            console.error('[BrandVoicesPage] Error parsing direct fetch response:', parseError);
-            setErrorMessage('Failed to parse API response');
-          }
-        } else {
-          const errorBody = await directResponse.text();
-          console.error(`[BrandVoicesPage] Direct fetch error: ${directResponse.status} - ${errorBody}`);
-          setErrorMessage(`API error: ${directResponse.status} - ${directResponse.statusText}`);
-        }
-      } catch (directError) {
-        console.error('[BrandVoicesPage] Direct fetch failed:', directError);
-        if (directError instanceof Error) {
-          console.error('[BrandVoicesPage] Direct fetch error message:', directError.message);
-          console.error('[BrandVoicesPage] Direct fetch error stack:', directError.stack);
-        }
-        setErrorMessage('Failed to connect to the backend server. Please check if the server is running.');
       }
     } finally {
       setIsLoading(false);

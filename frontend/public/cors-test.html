@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORS Test</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    pre { background: #f5f5f5; padding: 10px; border-radius: 4px; overflow: auto; }
+    button { padding: 8px 16px; margin-right: 10px; cursor: pointer; }
+    .success { color: green; }
+    .error { color: red; }
+    .section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <h1>CORS Test Tool</h1>
+  <p>This tool helps diagnose CORS issues with the backend API.</p>
+  
+  <div class="section">
+    <h2>1. Test Backend Availability</h2>
+    <button id="pingBtn">Ping Backend</button>
+    <div id="pingResult"></div>
+  </div>
+  
+  <div class="section">
+    <h2>2. Test OPTIONS Preflight Request</h2>
+    <button id="optionsBtn">Send OPTIONS Request</button>
+    <div id="optionsResult"></div>
+  </div>
+  
+  <div class="section">
+    <h2>3. Test GET Request</h2>
+    <button id="getBtn">Send GET Request</button>
+    <div id="getResult"></div>
+  </div>
+  
+  <div class="section">
+    <h2>4. Test with Credentials</h2>
+    <button id="credentialsBtn">Send Request with Credentials</button>
+    <div id="credentialsResult"></div>
+  </div>
+  
+  <script>
+    // Backend API URL
+    const API_URL = 'http://localhost:8000/api';
+    
+    // Helper to display results
+    function displayResult(elementId, success, data) {
+      const element = document.getElementById(elementId);
+      element.innerHTML = `
+        <p class="${success ? 'success' : 'error'}">${success ? 'Success' : 'Error'}</p>
+        <pre>${JSON.stringify(data, null, 2)}</pre>
+      `;
+    }
+    
+    // Test 1: Ping backend
+    document.getElementById('pingBtn').addEventListener('click', async () => {
+      try {
+        console.log('Pinging backend...');
+        const response = await fetch(`${API_URL}/`);
+        const data = await response.json();
+        displayResult('pingResult', true, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries([...response.headers.entries()]),
+          data
+        });
+      } catch (error) {
+        console.error('Ping error:', error);
+        displayResult('pingResult', false, {
+          error: error.message,
+          stack: error.stack
+        });
+      }
+    });
+    
+    // Test 2: OPTIONS preflight request
+    document.getElementById('optionsBtn').addEventListener('click', async () => {
+      try {
+        console.log('Sending OPTIONS request...');
+        const response = await fetch(`${API_URL}/voices/`, {
+          method: 'OPTIONS',
+          headers: {
+            'Origin': window.location.origin,
+            'Access-Control-Request-Method': 'GET',
+            'Access-Control-Request-Headers': 'Content-Type, Authorization'
+          }
+        });
+        
+        displayResult('optionsResult', response.ok, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries([...response.headers.entries()])
+        });
+      } catch (error) {
+        console.error('OPTIONS error:', error);
+        displayResult('optionsResult', false, {
+          error: error.message,
+          stack: error.stack
+        });
+      }
+    });
+    
+    // Test 3: GET request
+    document.getElementById('getBtn').addEventListener('click', async () => {
+      try {
+        console.log('Sending GET request...');
+        const response = await fetch(`${API_URL}/voices/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+        
+        let data;
+        try {
+          data = await response.json();
+        } catch (e) {
+          data = await response.text();
+        }
+        
+        displayResult('getResult', response.ok, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries([...response.headers.entries()]),
+          data
+        });
+      } catch (error) {
+        console.error('GET error:', error);
+        displayResult('getResult', false, {
+          error: error.message,
+          stack: error.stack
+        });
+      }
+    });
+    
+    // Test 4: Request with credentials
+    document.getElementById('credentialsBtn').addEventListener('click', async () => {
+      try {
+        console.log('Sending request with credentials...');
+        const response = await fetch(`${API_URL}/voices/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        let data;
+        try {
+          data = await response.json();
+        } catch (e) {
+          data = await response.text();
+        }
+        
+        displayResult('credentialsResult', response.ok, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries([...response.headers.entries()]),
+          data
+        });
+      } catch (error) {
+        console.error('Credentials error:', error);
+        displayResult('credentialsResult', false, {
+          error: error.message,
+          stack: error.stack
+        });
+      }
+    });
+  </script>
+</body>
+</html>

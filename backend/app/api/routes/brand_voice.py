@@ -92,6 +92,35 @@ def read_brand_voices(
     voices = query.offset(skip).limit(limit).all()
     return voices
 
+@router.get("/all/", response_model=List[BrandVoiceResponse])
+def read_all_brand_voices(
+    skip: int = 0,
+    limit: int = 100,
+    status: BrandVoiceStatus = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """Get all brand voices without tenant filtering for development purposes"""
+    # Only allow this in development mode or for admin users
+    is_dev = os.environ.get("ENV") == "development"
+    
+    if not is_dev and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to access all brand voices"
+        )
+    
+    # Build query without tenant filtering
+    query = db.query(BrandVoice)
+    
+    # Filter by status if provided
+    if status:
+        query = query.filter(BrandVoice.status == status)
+    
+    voices = query.offset(skip).limit(limit).all()
+    print(f"[DEBUG] Returning {len(voices)} brand voices without tenant filtering")
+    return voices
+
 @router.get("/{voice_id}", response_model=BrandVoiceResponse)
 def read_brand_voice(
     voice_id: str,
