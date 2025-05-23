@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { brandVoiceService } from '@/lib/api/brand-voice-service';
-import { BrandVoice } from '@/components/brand-voice/brand-voice-card';
+import { BrandVoice as BrandVoiceCard } from '@/components/brand-voice/brand-voice-card';
+import { BrandVoice } from '@/types/brand-voice';
 import { FloatingActions } from '@/components/brand-voice/floating-actions';
 import { VersionHistory } from '@/components/brand-voice/version-history';
+import { BRAND_VOICE_CONFIG } from '@/config/brand-voice-config';
 
 export default function BrandVoiceDetailPage() {
   const router = useRouter();
@@ -179,6 +181,8 @@ export default function BrandVoiceDetailPage() {
                             ? "bg-green-100 text-green-800"
                             : brandVoice.status === "under_review"
                             ? "bg-blue-100 text-blue-800"
+                            : brandVoice.status === "inactive"
+                            ? "bg-gray-100 text-gray-800"
                             : "bg-gray-100 text-gray-800"
                         }`}
                       >
@@ -249,7 +253,23 @@ export default function BrandVoiceDetailPage() {
                 {/* Version History Section */}
                 <div className="border-t border-[#E2E8F0] pt-4 mt-4">
                   <VersionHistory 
-                    brandVoiceId={id} 
+                    brandVoiceId={id}
+                    currentVersion={{
+                      id: brandVoice.id,
+                      brand_voice_id: brandVoice.id,
+                      version_number: brandVoice.version,
+                      name: brandVoice.name,
+                      description: brandVoice.description,
+                      voice_metadata: brandVoice.voice_metadata,
+                      dos: brandVoice.dos,
+                      donts: brandVoice.donts,
+                      status: brandVoice.status,
+                      created_by: 'Current User', // This would ideally come from user context
+                      created_by_id: brandVoice.created_by_id,
+                      created_at: brandVoice.created_at,
+                      updated_at: brandVoice.updated_at,
+                      published_at: brandVoice.published_at
+                    }}
                     onVersionRestore={() => {
                       // Refresh the brand voice data after restoring a version
                       const fetchBrandVoice = async () => {

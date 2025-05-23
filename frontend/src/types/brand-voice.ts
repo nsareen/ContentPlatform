@@ -17,7 +17,7 @@ export interface BrandVoice {
   donts: string;
   tenant_id: string;
   version: number;
-  status: 'draft' | 'published' | 'archived';
+  status: 'draft' | 'published' | 'under_review' | 'inactive';
   created_by_id: string;
   created_at: string;
   updated_at: string | null;
@@ -34,7 +34,7 @@ export interface BrandVoiceUpdateRequest {
   };
   dos?: string;
   donts?: string;
-  status?: 'draft' | 'published' | 'archived';
+  status?: 'draft' | 'published' | 'under_review' | 'inactive';
 }
 
 export interface BrandVoiceVersion {
@@ -50,8 +50,33 @@ export interface BrandVoiceVersion {
   };
   dos: string;
   donts: string;
-  status: 'draft' | 'published' | 'archived';
-  created_by_id: string;
+  status: 'draft' | 'published' | 'under_review' | 'inactive';
+  created_by: string;
+  created_by_id?: string;
   created_at: string;
+  updated_at?: string | null;
   published_at: string | null;
+}
+
+/**
+ * Version Comparison Types
+ */
+
+// Type for representing a change in a field between versions
+export type ChangeType = 'added' | 'removed' | 'modified' | 'unchanged';
+
+// Represents a difference in a specific field between versions
+export interface VersionDiff {
+  field: string;          // The field that changed (can be a nested path like 'voice_metadata.personality')
+  oldValue: any;          // The value in the base version
+  newValue: any;          // The value in the compared version
+  changeType: ChangeType; // The type of change
+  displayName: string;    // User-friendly name for the field
+}
+
+// Represents a complete comparison between two versions
+export interface VersionComparison {
+  baseVersion: BrandVoiceVersion;     // The base version for comparison
+  comparedVersion: BrandVoiceVersion; // The version being compared against the base
+  differences: VersionDiff[];         // List of differences between versions
 }

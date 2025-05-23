@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BrandVoiceList } from '@/components/brand-voice/brand-voice-list';
 import { brandVoiceService } from '@/lib/api/brand-voice-service';
-import { BrandVoice } from '@/components/brand-voice/brand-voice-card';
+// Import BrandVoice from the types directory instead of the component
+import { BrandVoice } from '@/types/brand-voice';
 import { AlertCircle } from 'lucide-react';
 
 export default function BrandVoicesPage() {
@@ -36,10 +37,22 @@ export default function BrandVoicesPage() {
       if (error instanceof Error) {
         console.error('[BrandVoicesPage] Error message:', error.message);
         console.error('[BrandVoicesPage] Error stack:', error.stack);
-        setErrorMessage(`Failed to load brand voices: ${error.message}`);
+        
+        // Provide more specific error messages based on the error
+        if (error.message.includes('Failed to fetch') || error.message === 'Load failed') {
+          setErrorMessage('Failed to connect to the backend server. Please ensure the backend is running on port 8001.');
+        } else if (error.message.includes('status 401') || error.message.includes('status 403')) {
+          setErrorMessage('Authentication error. Please check your API token or login again.');
+        } else if (error.message.includes('status 404')) {
+          setErrorMessage('API endpoint not found. Please check the API configuration.');
+        } else if (error.message.includes('status 500')) {
+          setErrorMessage('Backend server error. Please check the server logs for details.');
+        } else {
+          setErrorMessage(`Failed to load brand voices: ${error.message}`);
+        }
       } else {
         console.error('[BrandVoicesPage] Unknown error type:', typeof error);
-        setErrorMessage('Failed to load brand voices: Unknown error');
+        setErrorMessage('Failed to load brand voices: Unknown error. Check if the backend server is running.');
       }
     } finally {
       setIsLoading(false);
@@ -218,10 +231,12 @@ export default function BrandVoicesPage() {
         ) : brandVoices && brandVoices.length > 0 ? (
           <div className="space-y-4">
             {filteredVoices.map((voice: BrandVoice) => (
-              <div key={voice.id} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+              <div key={voice.id} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = `/brand-voices/${voice.id}`}>
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-medium text-[#1E2334]">{voice.name}</h3>
+                    <h3 className="text-lg font-medium text-[#1E2334] hover:text-[#6D3BEB]">
+                      <Link href={`/brand-voices/${voice.id}`}>{voice.name}</Link>
+                    </h3>
                     <p className="text-sm text-gray-600 mt-1">{voice.description}</p>
                     <div className="mt-2 flex items-center space-x-2">
                       <span className={`px-2 py-0.5 text-xs rounded-full ${voice.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
@@ -230,7 +245,13 @@ export default function BrandVoicesPage() {
                       <span className="text-xs text-gray-500">Version {voice.version}</span>
                     </div>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => window.location.href = `/brand-voices/${voice.id}`}
+                      className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                    >
+                      View
+                    </button>
                     <button
                       onClick={() => handleEdit(voice)}
                       className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"

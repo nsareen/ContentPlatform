@@ -194,3 +194,12 @@ def test_brand_voice_versions(db_session):
             headers={"Authorization": f"Bearer {MOCK_ADMIN_TOKEN}"}
         )
         assert restore_response.status_code == 200
+        
+        # Verify that a new version was created after restoration
+        updated_versions_response = client.get(
+            f"/api/voices/{voice_id}/versions/",
+            headers={"Authorization": f"Bearer {MOCK_ADMIN_TOKEN}"}
+        )
+        assert updated_versions_response.status_code == 200
+        updated_versions = updated_versions_response.json()
+        assert len(updated_versions) > len(versions)
