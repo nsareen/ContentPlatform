@@ -61,7 +61,7 @@ async def root():
     return {"message": "Welcome to the Content Platform API"}
 
 # Import and include routers
-from app.api.routes import auth, tenant, user, brand_voice, agent, rich_content, proxy
+from app.api.routes import auth, tenant, user, brand_voice, agent, rich_content, proxy, brand_voice_analysis
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(tenant.router, prefix="/api")
@@ -70,6 +70,7 @@ app.include_router(brand_voice.router, prefix="/api")
 app.include_router(agent.router, prefix="/api")
 app.include_router(rich_content.router, prefix="/api")
 app.include_router(proxy.router, prefix="/api")
+app.include_router(brand_voice_analysis.router, prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn
