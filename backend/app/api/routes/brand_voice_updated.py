@@ -186,48 +186,24 @@ def update_brand_voice(
     
     # Create a version record before updating the brand voice
     if is_significant_change:
-        try:
-            print(f"[DEBUG] Creating version record for brand voice {db_voice.id}")
-            print(f"[DEBUG] Current version: {db_voice.version}")
-            
-            # Update version number
-            new_version_number = db_voice.version + 1
-            voice_data["version"] = new_version_number
-            print(f"[DEBUG] New version number: {new_version_number}")
-            
-            # Create a new version record with detailed error handling
-            print(f"[DEBUG] Creating BrandVoiceVersion with data:")
-            print(f"[DEBUG] - brand_voice_id: {db_voice.id}")
-            print(f"[DEBUG] - version_number: {db_voice.version}")
-            print(f"[DEBUG] - name: {db_voice.name}")
-            print(f"[DEBUG] - description: {db_voice.description}")
-            print(f"[DEBUG] - voice_metadata: {db_voice.voice_metadata}")
-            print(f"[DEBUG] - status: {db_voice.status}")
-            print(f"[DEBUG] - created_by_id: {current_user.id}")
-            
-            # Create a new version record with all required fields including created_at
-            current_time = datetime.now()
-            version = BrandVoiceVersion(
-                brand_voice_id=db_voice.id,
-                version_number=db_voice.version,  # Store the current version before updating
-                name=db_voice.name,
-                description=db_voice.description,
-                voice_metadata=db_voice.voice_metadata,
-                dos=db_voice.dos,
-                donts=db_voice.donts,
-                status=db_voice.status,
-                created_by_id=current_user.id,
-                published_at=db_voice.published_at,
-                created_at=current_time  # Add the missing created_at field
-            )
-            db.add(version)
-            print(f"[DEBUG] Version record created successfully")
-        except Exception as e:
-            print(f"[ERROR] Failed to create version record: {str(e)}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to create version record: {str(e)}"
-            )
+        # Update version number
+        new_version_number = db_voice.version + 1
+        voice_data["version"] = new_version_number
+        
+        # Create a new version record
+        version = BrandVoiceVersion(
+            brand_voice_id=db_voice.id,
+            version_number=db_voice.version,  # Store the current version before updating
+            name=db_voice.name,
+            description=db_voice.description,
+            voice_metadata=db_voice.voice_metadata,
+            dos=db_voice.dos,
+            donts=db_voice.donts,
+            status=db_voice.status,
+            created_by_id=current_user.id,
+            published_at=db_voice.published_at
+        )
+        db.add(version)
     
     # Update the brand voice with new data
     for key, value in voice_data.items():

@@ -34,11 +34,11 @@ export function VersionHistory({ brandVoiceId, onVersionRestore }: VersionHistor
     fetchVersions();
   }, [brandVoiceId]);
 
-  const handleRestore = async (versionId: string) => {
+  const handleRestore = async (versionNumber: number) => {
     if (window.confirm('Are you sure you want to restore this version? This will create a new version based on the selected one.')) {
       try {
         setIsRestoring(true);
-        await brandVoiceService.restoreBrandVoiceVersion(brandVoiceId, versionId);
+        await brandVoiceService.restoreBrandVoiceVersion(brandVoiceId, versionNumber);
         onVersionRestore();
         setError(null);
       } catch (err) {
@@ -118,7 +118,7 @@ export function VersionHistory({ brandVoiceId, onVersionRestore }: VersionHistor
                   className="text-[#6D3BEB] hover:text-[#5A26B8] font-medium text-sm px-3 py-1 rounded-md hover:bg-[#F5F0FF] mr-2"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleRestore(version.id);
+                    handleRestore(version.version_number);
                   }}
                   disabled={isRestoring}
                 >

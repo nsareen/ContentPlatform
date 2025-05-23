@@ -80,6 +80,31 @@ class BrandVoice(Base):
     tenant = relationship("Tenant", back_populates="brand_voices")
     created_by = relationship("User", back_populates="created_brand_voices")
     content_projects = relationship("ContentProject", back_populates="brand_voice")
+    versions = relationship("BrandVoiceVersion", back_populates="brand_voice", 
+                          order_by="desc(BrandVoiceVersion.version_number)", 
+                          cascade="all, delete-orphan")
+
+class BrandVoiceVersion(Base):
+    __tablename__ = "brand_voice_versions"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    brand_voice_id = Column(String, ForeignKey("brand_voices.id", ondelete="CASCADE"))
+    version_number = Column(Integer, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_by_id = Column(String, ForeignKey("users.id"))
+    published_at = Column(DateTime(timezone=True), nullable=True)
+    
+    # Version data (snapshot of brand voice at the time of version creation)
+    name = Column(String, nullable=False)
+    description = Column(Text)
+    voice_metadata = Column(JSON, nullable=True)
+    dos = Column(Text)
+    donts = Column(Text)
+    status = Column(Enum(BrandVoiceStatus), default=BrandVoiceStatus.DRAFT)
+    
+    # Relationships
+    brand_voice = relationship("BrandVoice", back_populates="versions")
+    created_by = relationship("User")
 
 class ContentProject(Base):
     __tablename__ = "content_projects"

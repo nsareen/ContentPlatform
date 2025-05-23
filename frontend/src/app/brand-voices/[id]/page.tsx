@@ -6,11 +6,28 @@ import Link from 'next/link';
 import { brandVoiceService } from '@/lib/api/brand-voice-service';
 import { BrandVoice } from '@/components/brand-voice/brand-voice-card';
 import { FloatingActions } from '@/components/brand-voice/floating-actions';
+import { VersionHistory } from '@/components/brand-voice/version-history';
 
 export default function BrandVoiceDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string;
+  
+  if (!id) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-[#F8FAFC]">
+        <div className="text-center py-12">
+          <p className="text-red-500 mb-4">Brand voice ID is missing</p>
+          <button 
+            className="px-4 py-2 bg-[#6D3BEB] text-white rounded-md text-sm font-medium hover:bg-[#5A26B8]"
+            onClick={() => router.push('/brand-voices')}
+          >
+            Back to Brand Voices
+          </button>
+        </div>
+      </div>
+    );
+  }
   
   const [brandVoice, setBrandVoice] = useState<BrandVoice | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -227,6 +244,25 @@ export default function BrandVoiceDetailPage() {
                       </div>
                     )}
                   </div>
+                </div>
+                
+                {/* Version History Section */}
+                <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                  <VersionHistory 
+                    brandVoiceId={id} 
+                    onVersionRestore={() => {
+                      // Refresh the brand voice data after restoring a version
+                      const fetchBrandVoice = async () => {
+                        try {
+                          const data = await brandVoiceService.getBrandVoice(id);
+                          setBrandVoice(data);
+                        } catch (err) {
+                          console.error('Failed to fetch brand voice after version restore:', err);
+                        }
+                      };
+                      fetchBrandVoice();
+                    }} 
+                  />
                 </div>
               </div>
             </div>

@@ -26,6 +26,15 @@ class TenantBase(BaseModel):
     name: str
     config: Optional[Dict[str, Any]] = None
 
+class BrandVoiceVersionBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    voice_metadata: Optional[Dict[str, Any]] = None
+    dos: Optional[str] = None
+    donts: Optional[str] = None
+    status: BrandVoiceStatus = BrandVoiceStatus.DRAFT
+    version_number: int
+
 class UserBase(BaseModel):
     email: EmailStr
     full_name: Optional[str] = None
@@ -57,6 +66,10 @@ class FeedbackBase(BaseModel):
 # Create schemas
 class TenantCreate(TenantBase):
     pass
+
+class BrandVoiceVersionCreate(BrandVoiceVersionBase):
+    brand_voice_id: str
+    created_by_id: str
 
 class UserCreate(UserBase):
     password: str
@@ -167,6 +180,16 @@ class FeedbackResponse(FeedbackBase):
     id: str
     task_id: str
     created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class BrandVoiceVersionResponse(BrandVoiceVersionBase):
+    id: str
+    brand_voice_id: str
+    created_by_id: str
+    created_at: datetime
+    published_at: Optional[datetime] = None
 
     class Config:
         orm_mode = True

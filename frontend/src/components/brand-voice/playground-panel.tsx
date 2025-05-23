@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { X, Send, Loader2, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DIRECT_BACKEND_URL } from '@/config/api-config';
+// Import the DEV_TOKEN for development testing
+import { DEV_TOKEN } from '@/lib/api/constants';
 
 interface PlaygroundPanelProps {
   isOpen: boolean;
@@ -25,18 +28,18 @@ export function PlaygroundPanel({ isOpen, onClose, brandVoiceId, brandVoiceName 
       setIsGenerating(true);
       setGeneratedContent('');
       
-      // Get the authentication token
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('Authentication token not found. Please log in again.');
-      }
+      // Use direct backend URL to bypass Next.js proxy issues
+      const directUrl = `${DIRECT_BACKEND_URL}/api/agent/generate`;
+      
+      console.log(`[Playground] Generating content with direct URL: ${directUrl}`);
+      console.log(`[Playground] Brand Voice ID: ${brandVoiceId}`);
       
       // Call the agent API to generate content
-      const response = await fetch('http://localhost:8000/api/agent/generate', {
+      const response = await fetch(directUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${DEV_TOKEN}` // Use the development token for consistent auth
         },
         body: JSON.stringify({
           brand_voice_id: brandVoiceId,
@@ -47,11 +50,12 @@ export function PlaygroundPanel({ isOpen, onClose, brandVoiceId, brandVoiceName 
       
       if (!response.ok) {
         const errorText = await response.text();
+        console.error(`[Playground] Server error response:`, errorText);
         throw new Error(errorText || 'Failed to generate content');
       }
       
       const responseData = await response.json();
-      console.log('Content generated successfully:', responseData);
+      console.log('[Playground] Content generated successfully:', responseData);
       
       // Get the generated content from the response
       const generatedText = responseData.result?.content || 'No content was generated.';
@@ -62,7 +66,7 @@ export function PlaygroundPanel({ isOpen, onClose, brandVoiceId, brandVoiceName 
         setGeneratedContent(prev => prev + generatedText[i]);
       }
     } catch (error) {
-      console.error('Error generating content:', error);
+      console.error('[Playground] Error generating content:', error);
     } finally {
       setIsGenerating(false);
     }

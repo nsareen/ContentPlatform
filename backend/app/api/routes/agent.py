@@ -110,6 +110,12 @@ async def generate_content(
     
     # Check if user belongs to the tenant or is an admin
     if current_user.tenant_id != db_voice.tenant_id and current_user.role != UserRole.ADMIN:
+        # Log detailed information for debugging
+        print(f"[DEBUG] Authorization failed for brand voice access:")
+        print(f"[DEBUG] - User tenant: {current_user.tenant_id}")
+        print(f"[DEBUG] - Brand voice tenant: {db_voice.tenant_id}")
+        print(f"[DEBUG] - User role: {current_user.role}")
+        
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this brand voice"
