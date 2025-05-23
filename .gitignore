@@ -11,8 +11,10 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
+# Allow frontend lib directory
+!frontend/src/lib/
 parts/
 sdist/
 var/
@@ -54,8 +56,17 @@ htmlcov/
 .nox/
 
 # Temporary files
-*.json
+# Exclude JSON files except specific ones
+/*.json
+/backend/**/*.json
+/frontend/**/*.json
+# Allow specific JSON files
 !package.json
 !package-lock.json
 !tsconfig.json
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/tsconfig.json
+!backend/pyproject.json
+!backend/requirements.json
 temp_*/
