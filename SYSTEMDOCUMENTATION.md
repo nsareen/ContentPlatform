@@ -5,12 +5,13 @@
 2. [Architecture](#architecture)
 3. [Backend Configuration](#backend-configuration)
 4. [Frontend Configuration](#frontend-configuration)
-5. [Authentication System](#authentication-system)
-6. [API Integration](#api-integration)
-7. [CORS Configuration](#cors-configuration)
-8. [Common Issues and Solutions](#common-issues-and-solutions)
-9. [Development Workflow](#development-workflow)
-10. [Troubleshooting Guide](#troubleshooting-guide)
+5. [Brand Voice Analyzer](#brand-voice-analyzer)
+6. [Authentication System](#authentication-system)
+7. [API Integration](#api-integration)
+8. [CORS Configuration](#cors-configuration)
+9. [Common Issues and Solutions](#common-issues-and-solutions)
+10. [Development Workflow](#development-workflow)
+11. [Troubleshooting Guide](#troubleshooting-guide)
 
 ## System Overview
 
@@ -62,6 +63,7 @@ The Content Platform is a web application for creating, managing, and analyzing 
 | `/api/voices/{id}/analyze/` | POST | Brand voice analysis endpoint |
 | `/api/voices/{id}/versions/` | GET | Get all versions of a brand voice |
 | `/api/voices/{id}/versions/{version_id}/restore/` | POST | Restore a previous version |
+| `/api/brand-voice-analyzer/analyze/` | POST | Analyze content using LangGraph workflow |
 
 ### Database Models
 
@@ -99,6 +101,132 @@ app.add_middleware(
 ### Key Frontend Files
 - `src/config/api-config.ts` - API configuration including URLs and environment detection
 - `src/lib/api/brand-voice-service.ts` - Brand voice API service
+- `src/components/brand-voice/analyzer-panel.tsx` - Brand voice analyzer panel component
+- `src/components/brand-voice/analyzer-components/` - Modular components for the analyzer panel
+- `src/components/brand-voice/floating-actions.tsx` - Floating action menu with analyzer integration
+
+## Brand Voice Analyzer
+
+### Overview
+
+The Brand Voice Analyzer is a feature that allows users to analyze content against brand voice guidelines. It provides real-time feedback on how well the content aligns with the brand's personality, tonality, dos, and don'ts. The analyzer uses a LangGraph-based workflow on the backend and a modular, interactive UI on the frontend.
+
+### Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│                 │     │                 │     │                 │
+│  Analyzer Panel │────▶│  Brand Voice    │────▶│  LangGraph      │
+│  (Frontend)     │     │  Service        │     │  Workflow       │
+│                 │◀────│                 │◀────│                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+### Backend Components
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/brand-voice-analyzer/analyze/` | POST | Analyzes content against brand voice guidelines using LangGraph |
+
+#### LangGraph Workflow
+
+The analyzer uses a LangGraph workflow that processes content through the following steps:
+
+1. **Content Analysis**: Analyzes the raw content for style, tone, and language patterns
+2. **Brand Voice Comparison**: Compares the content against the brand voice guidelines
+3. **Score Calculation**: Calculates alignment scores for personality, tonality, dos, and don'ts
+4. **Suggestion Generation**: Generates actionable suggestions for improvement
+5. **Report Compilation**: Compiles a comprehensive analysis report
+
+#### Request Format
+
+```json
+{
+  "brand_voice_id": "string",
+  "content": "string",
+  "options": {
+    "analysis_depth": "detailed",
+    "include_suggestions": true
+  }
+}
+```
+
+#### Response Format
+
+```json
+{
+  "success": true,
+  "analysis_result": {
+    "overall_score": 0.85,
+    "personality_score": 0.9,
+    "tonality_score": 0.8,
+    "dos_alignment": 0.9,
+    "donts_alignment": 0.7,
+    "report": "string with markdown formatting"
+  }
+}
+```
+
+### Frontend Components
+
+The analyzer UI is built using a modular component architecture for better maintainability and code organization:
+
+#### Main Components
+
+- **AnalyzerPanel**: The main container component that manages state and orchestrates the analysis workflow
+- **ScoreDisplay**: Displays brand voice alignment scores in a grid layout
+- **SuggestionChips**: Interactive suggestion chips that can be clicked to apply improvements
+- **AnalysisComparison**: Compares previous and current analysis results to show improvement
+- **ProgressIndicator**: Shows the progress of the analysis process with visual feedback
+
+#### Key Features
+
+1. **Interactive Suggestions**: Users can click on suggestion chips to automatically apply them to the content
+2. **Re-analysis**: After applying suggestions, users can re-analyze the content to see improvement
+3. **Comparison View**: Shows before/after metrics when content is re-analyzed
+4. **Detailed Report**: Provides a comprehensive markdown-formatted report with analysis details
+5. **Scrollable Interface**: The panel has proper scrolling to accommodate large reports and many suggestions
+
+#### Integration Points
+
+- Integrated into the floating actions menu for easy access
+- Uses the brand voice service for API communication
+- Compatible with the existing version history functionality
+
+### Configuration Requirements
+
+- Backend server must run on port 8001 for frontend connectivity
+- Frontend expects the backend at http://localhost:8001
+- API endpoints must include trailing slashes
+- Request body uses snake_case for backend compatibility
+- Response is transformed to camelCase for frontend use
+
+### Usage Flow
+
+1. User opens the analyzer panel from the floating actions menu
+2. User enters content to analyze and clicks the Analyze button
+3. System shows progress indicators during analysis
+4. Results are displayed with scores, suggestions, and a detailed report
+5. User can apply suggestions by clicking on them
+6. User can re-analyze the modified content to see improvement
+
+### Error Handling
+
+The analyzer includes comprehensive error handling:
+
+- Network errors are caught and displayed with user-friendly messages
+- Analysis failures show specific error information
+- Loading states prevent multiple simultaneous analyses
+- Timeout handling for long-running analyses
+
+### Best Practices
+
+- Use the `extractSuggestionsFromReport` utility to parse suggestions from the report
+- Follow the modular component pattern for future enhancements
+- Ensure proper null checking for analysis results
+- Use the comparison feature to show users the impact of their changes
 - `src/lib/auth/auth-service.ts` - Authentication service
 - `src/app/brand-voices/page.tsx` - Brand voices listing page
 - `src/app/brand-voices/[id]/edit/page.tsx` - Brand voice edit page
