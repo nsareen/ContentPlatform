@@ -12,7 +12,7 @@ from typing import Dict, List, Any, Optional, Union, Tuple, Callable
 from langchain.chat_models import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langgraph.graph import StateGraph, END
-from langgraph.prebuilt import ToolNode
+# Removed problematic import: from langgraph.prebuilt import ToolNode
 
 from app.agents.config import get_llm
 from app.agents.brand_voice_analysis.state import BrandVoiceAnalysisState
@@ -25,7 +25,7 @@ from app.agents.brand_voice_analysis.nodes import (
 )
 
 
-def create_brand_voice_analysis_agent(llm=None) -> StateGraph:
+def create_brand_voice_analysis_agent(llm=None):
     """Create a brand voice analysis agent using LangGraph.
     
     Args:
@@ -64,8 +64,16 @@ def create_brand_voice_analysis_agent(llm=None) -> StateGraph:
     # Set the entry point
     workflow.set_entry_point("content_analyzer")
     
-    # Compile the graph
-    return workflow.compile()
+    return workflow
+
+
+# Initialize the agent
+try:
+    brand_voice_analysis_agent = create_brand_voice_analysis_agent().compile()
+    print("Brand voice analysis agent initialized successfully")
+except Exception as e:
+    print(f"Error initializing brand voice analysis agent: {str(e)}")
+    brand_voice_analysis_agent = None
 
 
 async def invoke_analysis_agent(
@@ -87,6 +95,14 @@ async def invoke_analysis_agent(
     Returns:
         Analysis results including scores, issues, suggestions, and a report
     """
+    # Check if agent is initialized
+    if brand_voice_analysis_agent is None:
+        return {
+            "success": False,
+            "error": "Brand voice analysis agent is not initialized",
+            "analysis_result": None
+        }
+    
     # Create default options if not provided
     if options is None:
         options = {
@@ -97,11 +113,8 @@ async def invoke_analysis_agent(
             "generate_report": True
         }
     
-    # Create the agent
-    agent = create_brand_voice_analysis_agent()
-    
     # Create initial state
-    initial_state: BrandVoiceAnalysisState = {
+    initial_state = {
         "content": content,
         "brand_voice": brand_voice,
         "options": options,
@@ -113,7 +126,7 @@ async def invoke_analysis_agent(
     
     try:
         # Invoke the agent
-        result = await agent.ainvoke(initial_state)
+        result = await brand_voice_analysis_agent.ainvoke(initial_state)
         
         # Check for errors
         if "error" in result and result["error"]:
