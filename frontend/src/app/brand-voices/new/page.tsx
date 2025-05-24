@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { BrandVoiceForm } from '@/components/brand-voice/brand-voice-form';
 import { brandVoiceService } from '@/lib/api/brand-voice-service';
 import { authService } from '@/lib/api/auth-service';
+import { GeneratorPanel } from '@/components/brand-voice/generator-components';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Define the form data type to match our form
 type BrandVoiceFormData = {
@@ -21,8 +23,11 @@ type BrandVoiceFormData = {
 
 export default function NewBrandVoicePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const initialTab = searchParams?.get('tab') === 'generator' ? 'generator' : 'manual';
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   const handleSubmit = async (data: BrandVoiceFormData) => {
     setIsSubmitting(true);
@@ -118,11 +123,33 @@ export default function NewBrandVoicePage() {
             </div>
           )}
           
-          <BrandVoiceForm 
-            onSubmit={handleSubmit} 
-            onCancel={() => router.push('/brand-voices')}
-            isLoading={isSubmitting}
-          />
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="manual">Manual Creation</TabsTrigger>
+              <TabsTrigger value="generator">AI Generator</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="manual" className="space-y-4">
+              <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                <h3 className="text-lg font-medium mb-4">Create Brand Voice Manually</h3>
+                <BrandVoiceForm 
+                  onSubmit={handleSubmit} 
+                  onCancel={() => router.push('/brand-voices')}
+                  isLoading={isSubmitting}
+                />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="generator" className="space-y-4">
+              <GeneratorPanel 
+                onSave={(brandVoice) => {
+                  // Redirect to the brand voice detail page after saving
+                  window.location.href = `/brand-voices/${brandVoice.id}`;
+                }}
+                onCancel={() => router.push('/brand-voices')}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>

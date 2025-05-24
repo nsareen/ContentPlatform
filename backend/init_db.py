@@ -38,7 +38,6 @@ def seed_db():
         tenant = Tenant(
             id="tenant-123",
             name="Test Tenant",
-            domain="example.com",
             created_at=datetime.now()
         )
         db.add(tenant)
@@ -73,7 +72,12 @@ def seed_db():
                 "tonality": "Confident, energetic, sophisticated"
             },
             dos="Maintain an Empowering and Confident Tone\nKeep the Language Fun and Playful\nAppeal to the Desire for Convenience and Effortlessness",
-            donts="Don't Overload with Technical Details\nAvoid Formal, Stiff Language\nSteer Clear of Overused Beauty Clichés"
+            donts="Don't Overload with Technical Details\nAvoid Formal, Stiff Language\nSteer Clear of Overused Beauty Clichés",
+            source_content="Our brand is all about empowering individuals to express their unique style with confidence. We believe that beauty should be fun, playful, and effortless.",
+            generation_metadata={
+                "timestamp": "2025-05-24T08:00:00Z",
+                "generation_depth": "standard"
+            }
         )
         db.add(brand_voice1)
         
@@ -91,7 +95,12 @@ def seed_db():
                 "tonality": "Professional, clear, forward-thinking"
             },
             dos="Use Clear, Precise Language\nIncorporate Technical Terms Appropriately\nMaintain a Forward-Thinking Perspective",
-            donts="Avoid Overly Casual Language\nDon't Use Jargon Without Context\nAvoid Hyperbole and Exaggeration"
+            donts="Avoid Overly Casual Language\nDon't Use Jargon Without Context\nAvoid Hyperbole and Exaggeration",
+            source_content="TechVision Pro is dedicated to providing cutting-edge technology solutions with precision and expertise. We believe in clear communication that empowers our customers to make informed decisions.",
+            generation_metadata={
+                "timestamp": "2025-05-24T09:00:00Z",
+                "generation_depth": "detailed"
+            }
         )
         db.add(brand_voice2)
         

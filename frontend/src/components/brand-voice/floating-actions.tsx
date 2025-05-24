@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MessageSquare, Lightbulb, Wand2, BarChart, HelpCircle, ImageIcon, CheckCircle } from 'lucide-react';
+import { MessageSquare, Lightbulb, Wand2, BarChart, HelpCircle, ImageIcon, CheckCircle, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PlaygroundPanel } from './playground-panel';
 import RichPlaygroundPanel from './rich-playground-panel-v2';
 import AnalyzerPanel from './analyzer-panel';
+import { FloatingGeneratorPanel } from './generator-components/floating-generator-panel';
 
 interface FloatingActionsProps {
   brandVoiceId?: string;
@@ -51,6 +52,12 @@ export function FloatingActions({ brandVoiceId, brandVoiceName }: FloatingAction
           onClick={() => togglePanel('analyzer')}
         />
         <ActionButton 
+          icon={Sparkles} 
+          label="Generate Voice" 
+          isActive={activePanel === 'generator'}
+          onClick={() => togglePanel('generator')}
+        />
+        <ActionButton 
           icon={Wand2} 
           label="Refine" 
           isActive={activePanel === 'refine'}
@@ -91,6 +98,12 @@ export function FloatingActions({ brandVoiceId, brandVoiceName }: FloatingAction
         brandVoiceId={brandVoiceId}
         brandVoiceName={brandVoiceName}
       />
+      
+      {activePanel === 'generator' && (
+        <div className="fixed right-16 top-1/2 transform -translate-y-1/2 z-30">
+          <FloatingGeneratorPanel onClose={closePanel} />
+        </div>
+      )}
       
       {/* Other panels would be implemented similarly */}
     </>

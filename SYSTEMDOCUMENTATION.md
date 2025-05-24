@@ -6,12 +6,13 @@
 3. [Backend Configuration](#backend-configuration)
 4. [Frontend Configuration](#frontend-configuration)
 5. [Brand Voice Analyzer](#brand-voice-analyzer)
-6. [Authentication System](#authentication-system)
-7. [API Integration](#api-integration)
-8. [CORS Configuration](#cors-configuration)
-9. [Common Issues and Solutions](#common-issues-and-solutions)
-10. [Development Workflow](#development-workflow)
-11. [Troubleshooting Guide](#troubleshooting-guide)
+6. [Brand Voice Generator](#brand-voice-generator)
+7. [Authentication System](#authentication-system)
+8. [API Integration](#api-integration)
+9. [CORS Configuration](#cors-configuration)
+10. [Common Issues and Solutions](#common-issues-and-solutions)
+11. [Development Workflow](#development-workflow)
+12. [Troubleshooting Guide](#troubleshooting-guide)
 
 ## System Overview
 
@@ -194,6 +195,101 @@ The analyzer UI is built using a modular component architecture for better maint
 - Integrated into the floating actions menu for easy access
 - Uses the brand voice service for API communication
 - Compatible with the existing version history functionality
+
+### Configuration Requirements
+
+- Backend server must run on port 8001 for frontend connectivity
+- Frontend expects the backend at http://localhost:8001
+- API endpoints must include trailing slashes
+- Request body uses snake_case for backend compatibility
+- Response is transformed to camelCase for frontend use
+
+### Usage Flow
+
+## Brand Voice Generator
+
+The Brand Voice Generator is a feature that allows users to generate brand voice profiles from sample content using an AI agent. This feature complements the existing brand voice analyzer by enabling users to reverse-engineer brand voice characteristics from provided content.
+
+### System Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│                 │     │                 │     │                 │
+│  Frontend       │────▶│  API Service    │────▶│  LangGraph      │
+│  (React)        │     │  (FastAPI)      │     │  Agent          │
+│                 │◀────│                 │◀────│                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+### Backend Components
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/brand-voice-generator/generate/` | POST | Generate brand voice from sample content |
+| `/api/brand-voice-generator/save/` | POST | Save generated brand voice to database |
+| `/api/brand-voice-generator/refine/` | POST | Refine a generated brand voice based on feedback |
+
+#### Database Models
+
+The generator feature uses the existing `BrandVoice` and `BrandVoiceVersion` models with additional fields:
+
+- `source_content`: Stores the original content used to generate the brand voice
+- `generation_metadata`: Stores metadata about the generation process
+
+#### Request/Response Format
+
+**Generate Request:**
+```json
+{
+  "content": "Sample content text...",
+  "brand_name": "Optional Brand Name",
+  "industry": "Optional Industry",
+  "target_audience": "Optional Target Audience",
+  "options": {
+    "generation_depth": "basic|detailed",
+    "include_sample_content": true
+  }
+}
+```
+
+**Generate Response:**
+```json
+{
+  "success": true,
+  "brand_voice_components": {
+    "personality_traits": ["Trait1", "Trait2", "Trait3"],
+    "tonality": "Detailed tonality description...",
+    "identity": "Brand identity description...",
+    "dos": ["Do 1", "Do 2", "Do 3"],
+    "donts": ["Don't 1", "Don't 2", "Don't 3"],
+    "sample_content": "Original sample content..."
+  },
+  "generation_metadata": {
+    "timestamp": "2025-05-24T08:00:00Z",
+    "generation_depth": "detailed"
+  }
+}
+```
+
+### Frontend Components
+
+The generator UI is built using a modular component architecture with two main entry points:
+
+1. **Floating Generator Panel**: Quick access from the floating actions menu
+2. **Full Generator Panel**: Integrated into the brand voice creation page
+
+#### Main Components
+
+- **FloatingGeneratorPanel**: Compact panel for quick generation from the floating menu
+- **GeneratorPanel**: Full-featured panel for detailed generation and saving
+- **BrandVoicePreview**: Displays the generated brand voice profile with sections for personality traits, tonality, identity, dos, donts, and sample content
+
+#### Integration Points
+
+- **Floating Actions Menu**: Includes a generator button (sparkles icon) that opens the floating generator panel
+- **Brand Voice Creation Page**: Includes tabs for manual creation and AI-generated creation
 
 ### Configuration Requirements
 

@@ -7,6 +7,7 @@ import { brandVoiceService } from '@/lib/api/brand-voice-service';
 // Import BrandVoice from the types directory instead of the component
 import { BrandVoice } from '@/types/brand-voice';
 import { AlertCircle } from 'lucide-react';
+import { FloatingActions } from '@/components/brand-voice/floating-actions';
 
 export default function BrandVoicesPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -173,6 +174,8 @@ export default function BrandVoicesPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Add FloatingActions component for brand voice generator */}
+      <FloatingActions />
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold text-[#1E2334]">Brand Voices</h2>
         <Link

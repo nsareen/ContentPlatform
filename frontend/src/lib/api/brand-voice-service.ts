@@ -77,6 +77,35 @@ async function apiFetch<T>(endpoint: string, method: string = 'GET', body?: any)
 /**
  * Brand Voice API Service
  */
+export interface BrandVoiceGenerateRequest {
+  content: string;
+  brand_name?: string;
+  industry?: string;
+  target_audience?: string;
+  options?: {
+    generation_depth?: string;
+    include_sample_content?: boolean;
+  };
+}
+
+export interface BrandVoiceComponents {
+  personality_traits: string[];
+  tonality: string;
+  identity: string;
+  dos: string[];
+  donts: string[];
+  sample_content: string;
+}
+
+export interface BrandVoiceSaveRequest {
+  brand_voice_components: BrandVoiceComponents;
+  generation_metadata: any;
+  source_content: string;
+  name: string;
+  description?: string;
+  tenant_id?: string;
+}
+
 export const brandVoiceService = {
   /**
    * Get all brand voices
@@ -390,6 +419,82 @@ export const brandVoiceService = {
       return analysis;
     } catch (error) {
       console.error(`[BrandVoiceService] Failed to analyze content with LangGraph analyzer for brand voice ${voiceId}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Generate a brand voice profile from sample content
+   */
+  async generateBrandVoice(data: BrandVoiceGenerateRequest): Promise<any> {
+    try {
+      // Use DIRECT_BACKEND_URL for consistent behavior with other endpoints
+      // Note the trailing slash which is required by FastAPI
+      const endpoint = `${DIRECT_BACKEND_URL}/api/brand-voice-generator/generate/`;
+      
+      if (isDevelopment) {
+        console.log(`[BrandVoiceService] Generating brand voice: ${endpoint}`);
+      }
+      
+      const result = await apiFetch<any>(endpoint, 'POST', data);
+      
+      if (isDevelopment) {
+        console.log(`[BrandVoiceService] Brand voice generated successfully`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error(`[BrandVoiceService] Failed to generate brand voice:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Save a generated brand voice profile
+   */
+  async saveBrandVoice(data: BrandVoiceSaveRequest): Promise<any> {
+    try {
+      // Use DIRECT_BACKEND_URL for consistent behavior with other endpoints
+      const endpoint = `${DIRECT_BACKEND_URL}/api/brand-voice-generator/save/`;
+      
+      if (isDevelopment) {
+        console.log(`[BrandVoiceService] Saving generated brand voice: ${endpoint}`);
+      }
+      
+      const result = await apiFetch<any>(endpoint, 'POST', data);
+      
+      if (isDevelopment) {
+        console.log(`[BrandVoiceService] Generated brand voice saved successfully`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error(`[BrandVoiceService] Failed to save generated brand voice:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Refine a generated brand voice based on feedback
+   */
+  async refineBrandVoice(data: any): Promise<any> {
+    try {
+      // Use DIRECT_BACKEND_URL for consistent behavior with other endpoints
+      const endpoint = `${DIRECT_BACKEND_URL}/api/brand-voice-generator/refine/`;
+      
+      if (isDevelopment) {
+        console.log(`[BrandVoiceService] Refining brand voice: ${endpoint}`);
+      }
+      
+      const result = await apiFetch<any>(endpoint, 'POST', data);
+      
+      if (isDevelopment) {
+        console.log(`[BrandVoiceService] Brand voice refined successfully`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error(`[BrandVoiceService] Failed to refine brand voice:`, error);
       throw error;
     }
   }

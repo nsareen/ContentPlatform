@@ -70,6 +70,8 @@ class BrandVoice(Base):
     voice_metadata = Column(JSON)  # Stores personality, tonality, etc.
     dos = Column(Text)  # Do's guidelines
     donts = Column(Text)  # Don'ts guidelines
+    source_content = Column(Text, nullable=True)  # Original content used to generate the brand voice
+    generation_metadata = Column(JSON, nullable=True)  # Metadata about the generation process
     status = Column(Enum(BrandVoiceStatus), default=BrandVoiceStatus.DRAFT)
     created_by_id = Column(String, ForeignKey("users.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -100,6 +102,8 @@ class BrandVoiceVersion(Base):
     voice_metadata = Column(JSON, nullable=True)
     dos = Column(Text)
     donts = Column(Text)
+    source_content = Column(Text, nullable=True)  # Original content used to generate the brand voice
+    generation_metadata = Column(JSON, nullable=True)  # Metadata about the generation process
     status = Column(Enum(BrandVoiceStatus), default=BrandVoiceStatus.DRAFT)
     
     # Relationships
