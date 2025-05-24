@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MessageSquare, Lightbulb, Wand2, BarChart, HelpCircle, ImageIcon } from 'lucide-react';
+import { MessageSquare, Lightbulb, Wand2, BarChart, HelpCircle, ImageIcon, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PlaygroundPanel } from './playground-panel';
 import RichPlaygroundPanel from './rich-playground-panel-v2';
+import AnalyzerPanel from './analyzer-panel';
 
 interface FloatingActionsProps {
   brandVoiceId?: string;
@@ -44,6 +45,12 @@ export function FloatingActions({ brandVoiceId, brandVoiceName }: FloatingAction
           onClick={() => togglePanel('ideas')}
         />
         <ActionButton 
+          icon={CheckCircle} 
+          label="Analyzer" 
+          isActive={activePanel === 'analyzer'}
+          onClick={() => togglePanel('analyzer')}
+        />
+        <ActionButton 
           icon={Wand2} 
           label="Refine" 
           isActive={activePanel === 'refine'}
@@ -73,6 +80,13 @@ export function FloatingActions({ brandVoiceId, brandVoiceName }: FloatingAction
       
       <RichPlaygroundPanel 
         isOpen={activePanel === 'rich-playground'} 
+        onClose={closePanel}
+        brandVoiceId={brandVoiceId}
+        brandVoiceName={brandVoiceName}
+      />
+      
+      <AnalyzerPanel
+        isOpen={activePanel === 'analyzer'}
         onClose={closePanel}
         brandVoiceId={brandVoiceId}
         brandVoiceName={brandVoiceName}
